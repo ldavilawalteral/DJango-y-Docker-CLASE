@@ -1,0 +1,123 @@
+{% extends 'envios/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Cabecera de la página -->
+<div class="page-header">
+    <h1><i class="bi bi-speedometer2 me-2 text-primary"></i>Dashboard</h1>
+    <p>Resumen general del sistema de encomiendas Sipán Trans</p>
+</div>
+
+<!-- Tarjetas de estadísticas -->
+<div class="row g-4 mb-4">
+
+    <!-- Total -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-card__icon stat-card__icon--total">
+                <i class="bi bi-boxes"></i>
+            </div>
+            <div>
+                <div class="stat-card__value">{{ total }}</div>
+                <div class="stat-card__label">Total Encomiendas</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pendientes -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-card__icon stat-card__icon--pending">
+                <i class="bi bi-hourglass-split"></i>
+            </div>
+            <div>
+                <div class="stat-card__value">{{ pendientes }}</div>
+                <div class="stat-card__label">Pendientes</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- En tránsito -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-card__icon stat-card__icon--transit">
+                <i class="bi bi-truck"></i>
+            </div>
+            <div>
+                <div class="stat-card__value">{{ en_transito }}</div>
+                <div class="stat-card__label">En Tránsito</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Entregados -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-card__icon stat-card__icon--delivered">
+                <i class="bi bi-check-circle"></i>
+            </div>
+            <div>
+                <div class="stat-card__value">{{ entregados }}</div>
+                <div class="stat-card__label">Entregadas</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Acciones rápidas -->
+<div class="row g-4">
+    <div class="col-12 col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <i class="bi bi-lightning-charge-fill text-warning me-2"></i>Acciones Rápidas
+            </div>
+            <div class="card-body d-flex flex-column gap-3">
+                <a href="{% url 'envios:encomienda-create' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Registrar Nueva Encomienda
+                </a>
+                <a href="{% url 'envios:encomienda-list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-table me-2"></i>Ver Todas las Encomiendas
+                </a>
+                <a href="{% url 'admin:index' %}" class="btn btn-outline-dark" target="_blank">
+                    <i class="bi bi-shield-lock me-2"></i>Panel de Administración
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <i class="bi bi-info-circle-fill text-primary me-2"></i>Información del Sistema
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-3">
+                    Bienvenido al sistema de gestión de encomiendas de
+                    <strong>Sipán Trans</strong>. Desde aquí puedes controlar
+                    el estado de todos tus envíos en tiempo real.
+                </p>
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2">
+                        <span class="badge badge-estado badge-pendiente me-2">Pendiente</span>
+                        Paquete registrado, aún no sale a ruta
+                    </li>
+                    <li class="mb-2">
+                        <span class="badge badge-estado badge-transito me-2">En Tránsito</span>
+                        Paquete en camino al destino
+                    </li>
+                    <li class="mb-2">
+                        <span class="badge badge-estado badge-entregado me-2">Entregado</span>
+                        Paquete recibido por el destinatario
+                    </li>
+                    <li>
+                        <span class="badge badge-estado badge-devuelto me-2">Devuelto</span>
+                        Paquete regresado al remitente
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

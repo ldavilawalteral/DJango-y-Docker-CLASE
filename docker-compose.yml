@@ -1,23 +1,23 @@
-# docker-compose.yml
-
-version: '3.9'
+# docker-compose.yml — Sipán Trans
 
 services:
 
-  # Servicio de la app Django
+  # ── App Django ────────────────────────────────────────────────────────────
   web:
     build: .
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - .:/app          # monta el código en tiempo real
+      - .:/app
     ports:
       - "8000:8000"
     env_file:
-      - .env            # variables de entorno
+      - .env
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    restart: on-failure
 
-  # Servicio de PostgreSQL
+  # ── PostgreSQL ────────────────────────────────────────────────────────────
   db:
     image: postgres:15-alpine
     volumes:
@@ -26,6 +26,26 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5434:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ── pgAdmin ───────────────────────────────────────────────────────────────
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@sipantrans.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5051:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: on-failure
 
 volumes:
   postgres_data:

@@ -1,0 +1,132 @@
+{% extends 'envios/base.html' %}
+
+{% block title %}Encomiendas{% endblock %}
+
+{% block content %}
+<!-- Cabecera -->
+<div class="page-header d-flex align-items-center justify-content-between flex-wrap gap-3">
+    <div>
+        <h1><i class="bi bi-box-seam me-2 text-primary"></i>Encomiendas</h1>
+        <p>Listado de todas las encomiendas registradas en el sistema</p>
+    </div>
+    <a href="{% url 'envios:encomienda-create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-2"></i>Nueva Encomienda
+    </a>
+</div>
+
+<!-- Tabla -->
+<div class="card">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <span><i class="bi bi-table me-2"></i>Registros</span>
+        <span class="text-muted fw-normal fs-6">
+            {{ page_obj.paginator.count }} encomienda{{ page_obj.paginator.count|pluralize }}
+        </span>
+    </div>
+    <div class="card-body p-0">
+        {% if encomiendas %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th><i class="bi bi-upc me-1"></i>Código</th>
+                        <th><i class="bi bi-card-text me-1"></i>Descripción</th>
+                        <th><i class="bi bi-speedometer me-1"></i>Peso (kg)</th>
+                        <th><i class="bi bi-flag me-1"></i>Estado</th>
+                        <th><i class="bi bi-calendar me-1"></i>Fecha Envío</th>
+                        <th><i class="bi bi-calendar-check me-1"></i>Fecha Entrega</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for enc in encomiendas %}
+                    <tr>
+                        <td class="text-muted">{{ forloop.counter0|add:page_obj.start_index }}</td>
+                        <td>
+                            <strong>{{ enc.codigo }}</strong>
+                        </td>
+                        <td>{{ enc.descripcion|truncatechars:50 }}</td>
+                        <td>{{ enc.peso_kg }} kg</td>
+                        <td>
+                            {% if enc.estado == 'PE' %}
+                                <span class="badge badge-estado badge-pendiente">
+                                    <i class="bi bi-hourglass-split me-1"></i>Pendiente
+                                </span>
+                            {% elif enc.estado == 'TR' %}
+                                <span class="badge badge-estado badge-transito">
+                                    <i class="bi bi-truck me-1"></i>En Tránsito
+                                </span>
+                            {% elif enc.estado == 'EN' %}
+                                <span class="badge badge-estado badge-entregado">
+                                    <i class="bi bi-check-circle me-1"></i>Entregado
+                                </span>
+                            {% elif enc.estado == 'DE' %}
+                                <span class="badge badge-estado badge-devuelto">
+                                    <i class="bi bi-arrow-counterclockwise me-1"></i>Devuelto
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>{{ enc.fecha_envio|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            {% if enc.fecha_entrega %}
+                                {{ enc.fecha_entrega|date:"d/m/Y H:i" }}
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginación -->
+        {% if is_paginated %}
+        <div class="d-flex justify-content-center py-3 border-top">
+            <nav aria-label="Paginación de encomiendas">
+                <ul class="pagination pagination-sm mb-0">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <!-- Estado vacío -->
+        <div class="empty-state">
+            <i class="bi bi-inbox d-block"></i>
+            <h5 class="text-muted">No hay encomiendas registradas</h5>
+            <p class="text-muted mb-4">Comienza registrando tu primera encomienda.</p>
+            <a href="{% url 'envios:encomienda-create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Registrar Encomienda
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

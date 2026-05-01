@@ -1,0 +1,46 @@
+<!-- envios/templates/envios/includes/navbar.html -->
+<nav class="navbar navbar-expand-lg sipan-navbar">
+    <div class="container">
+        <!-- Brand -->
+        <a class="navbar-brand" href="{% url 'envios:home' %}">
+            <i class="bi bi-truck me-1"></i> Sipán<span>Trans</span>
+        </a>
+
+        <!-- Toggler para móviles -->
+        <button class="navbar-toggler border-0" type="button"
+                data-bs-toggle="collapse" data-bs-target="#navMain"
+                aria-controls="navMain" aria-expanded="false"
+                aria-label="Alternar menú">
+            <i class="bi bi-list text-white fs-4"></i>
+        </button>
+
+        <!-- Links -->
+        <div class="collapse navbar-collapse" id="navMain">
+            <ul class="navbar-nav ms-auto gap-1">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+                       href="{% url 'envios:home' %}">
+                        <i class="bi bi-house me-1"></i> Inicio
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'encomienda-list' %}active{% endif %}"
+                       href="{% url 'envios:encomienda-list' %}">
+                        <i class="bi bi-box-seam me-1"></i> Encomiendas
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'encomienda-create' %}active{% endif %}"
+                       href="{% url 'envios:encomienda-create' %}">
+                        <i class="bi bi-plus-circle me-1"></i> Nueva Encomienda
+                    </a>
+                </li>
+                <li class="nav-item ms-2">
+                    <a class="nav-link" href="{% url 'admin:index' %}" target="_blank">
+                        <i class="bi bi-shield-lock me-1"></i> Admin
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

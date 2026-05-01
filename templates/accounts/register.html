@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Mi Perfil{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="bi bi-person-circle me-2 text-primary"></i>Mi Perfil</h1>
+    <p>Información de tu cuenta en Sipán Trans</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-person me-2"></i>Datos del Empleado
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <div class="avatar-circle-lg mx-auto mb-3">
+                        {{ user.username|slice:":1"|upper }}
+                    </div>
+                    <h4 class="fw-bold">{{ user.get_full_name|default:user.username }}</h4>
+                    <p class="text-muted">{{ user.email|default:"Sin correo registrado" }}</p>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <div class="detail-field">
+                            <div class="detail-label">Usuario</div>
+                            <div class="detail-value">{{ user.username }}</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="detail-field">
+                            <div class="detail-label">Miembro desde</div>
+                            <div class="detail-value">{{ user.date_joined|date:"d/m/Y" }}</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="detail-field">
+                            <div class="detail-label">Último acceso</div>
+                            <div class="detail-value">{{ user.last_login|date:"d/m/Y H:i" }}</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="detail-field">
+                            <div class="detail-label">Rol</div>
+                            <div class="detail-value">
+                                {% if user.is_superuser %}
+                                    <span class="badge bg-danger">Superusuario</span>
+                                {% elif user.is_staff %}
+                                    <span class="badge bg-warning text-dark">Staff</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Empleado</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end mt-4">
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

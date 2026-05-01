@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block title %}Encomiendas — Sipán Trans{% endblock %}
+
+{% block content %}
+<!-- Cabecera -->
+<div class="page-header d-flex align-items-center justify-content-between flex-wrap gap-3">
+    <div>
+        <h1><i class="bi bi-box-seam me-2 text-primary"></i>Encomiendas</h1>
+        <p>Listado — {{ page_obj.paginator.count }} registro{{ page_obj.paginator.count|pluralize }}</p>
+    </div>
+    <a href="{% url 'envios:encomienda-create' %}" class="btn btn-primary" id="btn-nueva-encomienda-lista">
+        <i class="bi bi-plus-circle me-2"></i>Nueva Encomienda
+    </a>
+</div>
+
+<!-- Filtro por estado -->
+<div class="card mb-4">
+    <div class="card-body py-2">
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <span class="fw-600"><i class="bi bi-funnel me-1"></i>Filtrar:</span>
+            <a href="{% url 'envios:encomienda-list' %}"
+               class="btn btn-sm {% if not estado_actual %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+                Todos
+            </a>
+            {% for valor, nombre in estado_choices %}
+            <a href="?estado={{ valor }}"
+               class="btn btn-sm {% if estado_actual == valor %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+                {{ nombre }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Tabla -->
+<div class="card">
+    <div class="card-header">
+        <i class="bi bi-table me-2"></i>Registros
+        {% if estado_actual %}
+        — Filtrando: <span class="badge-estado badge-estado--{{ estado_actual }}">{{ estado_actual }}</span>
+        {% endif %}
+    </div>
+    <div class="card-body p-0">
+        {% if encomiendas %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Código</th>
+                        <th>Remitente</th>
+                        <th>Destinatario</th>
+                        <th>Ruta</th>
+                        <th>Peso</th>
+                        <th>Costo</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for enc in encomiendas %}
+                    <tr class="{% if enc.tiene_retraso %}table-warning{% endif %}">
+                        <td class="text-muted">{{ forloop.counter0|add:page_obj.start_index }}</td>
+                        <td><strong><code>{{ enc.codigo }}</code></strong></td>
+                        <td>{{ enc.remitente.apellido }}, {{ enc.remitente.nombre }}</td>
+                        <td>{{ enc.destinatario.apellido }}, {{ enc.destinatario.nombre }}</td>
+                        <td class="text-muted small">{{ enc.ruta.origen }} → {{ enc.ruta.destino }}</td>
+                        <td>{{ enc.peso_kg }} kg</td>
+                        <td>S/. {{ enc.costo_envio }}</td>
+                        <td>
+                            <span class="badge-estado badge-estado--{{ enc.estado }}">
+                                {{ enc.get_estado_display }}
+                            </span>
+                            {% if enc.tiene_retraso %}
+                            <i class="bi bi-exclamation-circle text-danger ms-1" title="Con retraso"></i>
+                            {% endif %}
+                        </td>
+                        <td class="text-muted small">{{ enc.fecha_envio|date:"d/m/Y" }}</td>
+                        <td>
+                            <a href="{% url 'envios:encomienda-detail' enc.pk %}"
+                               class="btn btn-sm btn-outline-primary"
+                               data-bs-toggle="tooltip" title="Ver detalle">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginación -->
+        {% if is_paginated %}
+        <div class="d-flex justify-content-center py-3 border-top">
+            <nav aria-label="Paginación">
+                <ul class="pagination pagination-sm mb-0">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{% if estado_actual %}estado={{ estado_actual }}&{% endif %}page={{ page_obj.previous_page_number }}">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?{% if estado_actual %}estado={{ estado_actual }}&{% endif %}page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{% if estado_actual %}estado={{ estado_actual }}&{% endif %}page={{ page_obj.next_page_number }}">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-inbox d-block fs-1 text-muted opacity-50 mb-2"></i>
+            <h5 class="text-muted">No hay encomiendas{% if estado_actual %} con ese estado{% endif %}</h5>
+            {% if not estado_actual %}
+            <a href="{% url 'envios:encomienda-create' %}" class="btn btn-primary mt-2">
+                <i class="bi bi-plus-circle me-2"></i>Registrar Encomienda
+            </a>
+            {% else %}
+            <a href="{% url 'envios:encomienda-list' %}" class="btn btn-outline-secondary mt-2">
+                Ver todas
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
