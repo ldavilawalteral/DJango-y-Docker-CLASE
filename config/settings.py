@@ -11,6 +11,8 @@ ALLOWED_HOSTS = [h.strip() for h in config('ALLOWED_HOSTS', default='localhost,1
 
 # ── Apps ─────────────────────────────────────────────────────────
 INSTALLED_APPS = [
+    # Daphne debe ir PRIMERO para reemplazar el servidor ASGI por defecto
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -21,6 +23,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'drf_spectacular',
+    # ── Sesión 07: Django Channels (WebSockets) ───────────────
+    'channels',
     # Nuestras apps del proyecto encomiendas
     'envios',
     'clientes',
@@ -91,6 +95,8 @@ SIMPLE_JWT = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # WhiteNoise debe ir justo después de SecurityMiddleware
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -118,6 +124,21 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
+
+# ── ASGI — Django Channels ────────────────────────────────────────
+ASGI_APPLICATION = 'config.asgi.application'
+
+# ── Channel Layers — Redis Backend ───────────────────────────────
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('redis', 6379)],
+            'capacity': 1500,          # mensajes máx. en cola por canal
+            'expiry': 10,              # segundos antes de descartar mensajes
+        },
+    },
+}
 
 
 # ── Base de datos ─────────────────────────────────────────────────
@@ -159,12 +180,15 @@ USE_I18N      = True
 USE_TZ        = True
 
 
-# ── Archivos estáticos ────────────────────────────────────────────
-STATIC_URL       = 'static/'
-STATIC_ROOT      = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [BASE_DIR / 'static']
-MEDIA_URL        = '/media/'
-MEDIA_ROOT       = BASE_DIR / 'media'
+# ── Archivos estáticos ────────────────────────────────────────────────
+STATIC_URL        = 'static/'
+STATIC_ROOT       = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS  = [BASE_DIR / 'static']
+MEDIA_URL         = '/media/'
+MEDIA_ROOT        = BASE_DIR / 'media'
+
+# WhiteNoise: sirve archivos estáticos comprimidos con Daphne
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 # ── Autenticación ────────────────────────────────────────────────
